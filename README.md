@@ -53,18 +53,26 @@ here is the `Dockerfile`
 FROM ubuntu:16.04
 MAINTAINER gyteng <igyteng@gmail.com>
 RUN apt-get update && \
-    apt-get install net-tools curl git sudo software-properties-common -y && \
+    apt-get install tzdata net-tools curl git sudo software-properties-common python-pip -y && \
+    pip install git+https://github.com/shadowsocks/shadowsocks.git@master && \
     add-apt-repository ppa:max-c-lv/shadowsocks-libev -y && \
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     apt-get install -y nodejs shadowsocks-libev && \
-    npm i -g shadowsocks-manager
+    npm i -g shadowsocks-manager && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    rm /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 ENTRYPOINT ["/usr/bin/ssmgr"]
 ```
 
 ### Usage
 1. Start shadowsocks with [manager API](https://github.com/shadowsocks/shadowsocks/wiki/Manage-Multiple-Users), it supports `shadowsocks-python` and `shadowsocks-libev`.
 For example, you can run this command:  
-`ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:6001`
+```
+ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:6001
+ or
+ssserver -m aes-256-cfb -p 12345 -k abcedf --manager-address 127.0.0.1:6001
+```
 2. run ssmgr with type s:
 
   config file:  
